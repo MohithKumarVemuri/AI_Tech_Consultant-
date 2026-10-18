@@ -3,7 +3,7 @@ import { z } from "zod";
 export interface LLMGenerateOptions<T> {
   prompt: string;
   system?: string;
-  schema?: z.ZodType<T>;
+  schema?: z.ZodType<T, any, any>;
   model?: string;
   temperature?: number;
   promptVersion?: string;

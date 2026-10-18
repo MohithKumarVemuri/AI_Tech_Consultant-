@@ -101,7 +101,7 @@ Return JSON with:
   const res = await llmClient.generate<DraftResult>({
     prompt: userPrompt,
     system: systemPrompt,
-    schema: DraftSchema,
+    schema: DraftSchema as any,
     promptVersion,
     temperature: 0.1,
   });

@@ -60,7 +60,7 @@ ${email.body}`;
   const res = await llmClient.generate<ClassificationResult>({
     prompt,
     system: SYSTEM_PROMPT,
-    schema: ClassificationSchema,
+    schema: ClassificationSchema as any,
     promptVersion: "classifier@v1",
     temperature: 0.0,
   });
