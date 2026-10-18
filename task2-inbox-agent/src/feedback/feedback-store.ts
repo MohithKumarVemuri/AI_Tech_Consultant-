@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 
 export interface FeedbackRecord {
   id: string;
@@ -18,38 +19,52 @@ export interface FeedbackRecord {
   timestamp: string;
 }
 
-const STORE_PATH = path.resolve(process.cwd(), "data", "feedback_history.json");
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const STORE_DIR = isServerless ? path.join(os.tmpdir(), "data") : path.resolve(process.cwd(), "data");
+const STORE_PATH = path.join(STORE_DIR, "feedback_history.json");
+
+// In-memory fallback for serverless / read-only filesystems
+let memoryFeedback: FeedbackRecord[] = [];
 
 function ensureStoreExists() {
-  const dir = path.dirname(STORE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(STORE_PATH)) {
-    fs.writeFileSync(STORE_PATH, JSON.stringify([], null, 2), "utf-8");
+  try {
+    if (!fs.existsSync(STORE_DIR)) {
+      fs.mkdirSync(STORE_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(STORE_PATH)) {
+      fs.writeFileSync(STORE_PATH, JSON.stringify([], null, 2), "utf-8");
+    }
+  } catch {
+    // Read-only filesystem fallback
   }
 }
 
 export function saveFeedback(record: FeedbackRecord): void {
-  ensureStoreExists();
+  memoryFeedback.unshift(record);
   try {
-    const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    const list: FeedbackRecord[] = JSON.parse(raw);
+    ensureStoreExists();
+    let list: FeedbackRecord[] = [];
+    if (fs.existsSync(STORE_PATH)) {
+      list = JSON.parse(fs.readFileSync(STORE_PATH, "utf-8"));
+    }
     list.unshift(record);
     fs.writeFileSync(STORE_PATH, JSON.stringify(list, null, 2), "utf-8");
   } catch (err) {
-    console.error("[FeedbackStore] Save failed:", err);
+    // In-memory array already holds the record
   }
 }
 
 export function getAllFeedback(): FeedbackRecord[] {
-  ensureStoreExists();
   try {
-    const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    return JSON.parse(raw);
+    ensureStoreExists();
+    if (fs.existsSync(STORE_PATH)) {
+      const diskList: FeedbackRecord[] = JSON.parse(fs.readFileSync(STORE_PATH, "utf-8"));
+      return diskList.length > 0 ? diskList : memoryFeedback;
+    }
   } catch {
-    return [];
+    // fallback
   }
+  return memoryFeedback;
 }
 
 export function getFeedbackForSubcategory(subcategory: string): FeedbackRecord[] {

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { DraftResult, EmailRecord } from "../email/types";
 
 export interface SubcategoryAutonomyState {
@@ -14,24 +15,34 @@ export interface SubcategoryAutonomyState {
   updatedAt: string;
 }
 
-const AUTONOMY_PATH = path.resolve(process.cwd(), "data", "autonomy_state.json");
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const AUTONOMY_DIR = isServerless ? path.join(os.tmpdir(), "data") : path.resolve(process.cwd(), "data");
+const AUTONOMY_PATH = path.join(AUTONOMY_DIR, "autonomy_state.json");
+
+let memoryStates: Record<string, SubcategoryAutonomyState> = {};
 
 function loadStates(): Record<string, SubcategoryAutonomyState> {
-  const dir = path.dirname(AUTONOMY_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(AUTONOMY_PATH)) {
-    fs.writeFileSync(AUTONOMY_PATH, JSON.stringify({}, null, 2), "utf-8");
-    return {};
-  }
   try {
-    return JSON.parse(fs.readFileSync(AUTONOMY_PATH, "utf-8"));
+    if (!fs.existsSync(AUTONOMY_DIR)) fs.mkdirSync(AUTONOMY_DIR, { recursive: true });
+    if (!fs.existsSync(AUTONOMY_PATH)) {
+      fs.writeFileSync(AUTONOMY_PATH, JSON.stringify({}, null, 2), "utf-8");
+      return memoryStates;
+    }
+    const diskStates = JSON.parse(fs.readFileSync(AUTONOMY_PATH, "utf-8"));
+    return { ...memoryStates, ...diskStates };
   } catch {
-    return {};
+    return memoryStates;
   }
 }
 
 function saveStates(states: Record<string, SubcategoryAutonomyState>): void {
-  fs.writeFileSync(AUTONOMY_PATH, JSON.stringify(states, null, 2), "utf-8");
+  memoryStates = { ...states };
+  try {
+    if (!fs.existsSync(AUTONOMY_DIR)) fs.mkdirSync(AUTONOMY_DIR, { recursive: true });
+    fs.writeFileSync(AUTONOMY_PATH, JSON.stringify(states, null, 2), "utf-8");
+  } catch {
+    // In-memory fallback
+  }
 }
 
 export class AutonomyManager {
@@ -75,12 +86,10 @@ export class AutonomyManager {
         current.eligible = true;
       }
     } else {
-      // Spec: Reset on edit/reject/failed check
       current.consecutiveUnchanged = 0;
       if (action === "edit_send") current.totalEdited += 1;
       if (action === "reject_write_own") current.totalRejected += 1;
 
-      // Check rolling quality monitor
       const recentTotal = current.totalApproved + current.totalEdited + current.totalRejected;
       const editRate = recentTotal > 0 ? (current.totalEdited + current.totalRejected) / recentTotal : 0;
 
@@ -131,7 +140,6 @@ export class AutonomyManager {
       return { canSend: false, reason: "Autonomy is not enabled by human operator for this subcategory." };
     }
 
-    // Safety checks per spec
     if (draft.risk !== "low") {
       return { canSend: false, reason: `Risk level is '${draft.risk}' (must be 'low').` };
     }

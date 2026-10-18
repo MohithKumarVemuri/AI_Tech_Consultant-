@@ -106,7 +106,10 @@ export default function InboxDashboard() {
         }),
       });
       const result = await res.json();
-      setNotification(`Action '${action}' saved. Similarity: ${result.diff.similarity} (Unchanged: ${result.diff.isUnchanged}). Simulated email sent!`);
+      if (!res.ok || result.error) {
+        throw new Error(result.error || "Review submission failed");
+      }
+      setNotification(`Action '${action}' saved. Similarity: ${result.diff?.similarity ?? 1.0} (Unchanged: ${result.diff?.isUnchanged ?? true}). Simulated email sent!`);
       fetchAutonomy();
 
       setTimeout(() => setNotification(null), 6000);

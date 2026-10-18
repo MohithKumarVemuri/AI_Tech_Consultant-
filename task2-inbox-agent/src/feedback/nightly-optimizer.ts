@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import { getAllFeedback } from "./feedback-store";
 
+import os from "os";
+
 export interface ProposedPromptRule {
   version: string;
   subcategory: string;
@@ -12,24 +14,32 @@ export interface ProposedPromptRule {
   createdAt: string;
 }
 
-const PROPOSALS_PATH = path.resolve(process.cwd(), "data", "prompt_proposals.json");
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const PROPOSALS_DIR = isServerless ? path.join(os.tmpdir(), "data") : path.resolve(process.cwd(), "data");
+const PROPOSALS_PATH = path.join(PROPOSALS_DIR, "prompt_proposals.json");
+
+let memoryProposals: ProposedPromptRule[] = [];
 
 function loadProposals(): ProposedPromptRule[] {
-  const dir = path.dirname(PROPOSALS_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(PROPOSALS_PATH)) {
-    fs.writeFileSync(PROPOSALS_PATH, JSON.stringify([], null, 2), "utf-8");
-    return [];
-  }
   try {
-    return JSON.parse(fs.readFileSync(PROPOSALS_PATH, "utf-8"));
+    if (!fs.existsSync(PROPOSALS_DIR)) fs.mkdirSync(PROPOSALS_DIR, { recursive: true });
+    if (!fs.existsSync(PROPOSALS_PATH)) {
+      fs.writeFileSync(PROPOSALS_PATH, JSON.stringify([], null, 2), "utf-8");
+      return memoryProposals;
+    }
+    const disk = JSON.parse(fs.readFileSync(PROPOSALS_PATH, "utf-8"));
+    return disk.length > 0 ? disk : memoryProposals;
   } catch {
-    return [];
+    return memoryProposals;
   }
 }
 
 function saveProposals(list: ProposedPromptRule[]) {
-  fs.writeFileSync(PROPOSALS_PATH, JSON.stringify(list, null, 2), "utf-8");
+  memoryProposals = [...list];
+  try {
+    if (!fs.existsSync(PROPOSALS_DIR)) fs.mkdirSync(PROPOSALS_DIR, { recursive: true });
+    fs.writeFileSync(PROPOSALS_PATH, JSON.stringify(list, null, 2), "utf-8");
+  } catch {}
 }
 
 export function runNightlyPromptOptimizer(): ProposedPromptRule[] {
