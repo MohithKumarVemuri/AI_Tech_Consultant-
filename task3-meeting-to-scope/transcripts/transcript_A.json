@@ -1,0 +1,49 @@
+{
+  "project_id": "PRJ-ALPHA",
+  "project_name": "Apex Medical Directory Search & Mobile Revamp",
+  "meeting_date": "2026-10-10T14:00:00Z",
+  "client_name": "Dr. Brenda Vance (Apex Health)",
+  "consultant_name": "Sarah Jenkins (Senior AI Architect)",
+  "dialogue": [
+    {
+      "timestamp": "00:02:15",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Thanks for jumping on Sarah. Our directory currently has over 4,000 healthcare providers, but patients complain that finding specialized practitioners is frustrating. We need a refined search sidebar on member listing pages."
+    },
+    {
+      "timestamp": "00:03:10",
+      "speaker": "Sarah Jenkins",
+      "text": "Understood. Brilliant Directories has a built-in Sidebar Search Module under Edit Post Types. What specific filters do your patients need?"
+    },
+    {
+      "timestamp": "00:03:45",
+      "speaker": "Dr. Brenda Vance",
+      "text": "We need filters for Medical Specialty, Insurance Accepted, Languages Spoken, and a legacy Fax Number search because older clinics still use it."
+    },
+    {
+      "timestamp": "00:05:20",
+      "speaker": "Sarah Jenkins",
+      "text": "Got it. What about the category hierarchy? How are doctors classified right now?"
+    },
+    {
+      "timestamp": "00:06:05",
+      "speaker": "Dr. Brenda Vance",
+      "text": "We need a clean 3-level taxonomy: Top level is General Field like Surgery, Sub-category is Specialty like Orthopedic Surgery, and Sub-Sub is Sub-specialty like Pediatric Orthopedics."
+    },
+    {
+      "timestamp": "00:08:30",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Also, more than 60% of our traffic comes from smartphones, but our search result cards look crowded and slow on mobile. We require a responsive mobile-first optimization of the provider cards."
+    },
+    {
+      "timestamp": "00:10:15",
+      "speaker": "Sarah Jenkins",
+      "text": "Perfect. And regarding timeline, what is your target launch window?"
+    },
+    {
+      "timestamp": "00:10:45",
+      "speaker": "Dr. Brenda Vance",
+      "text": "We need this live in production by November 15th, 2026, ahead of open enrollment."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Task 1: Knowledge Brain FastAPI
+  kb-api:
+    build:
+      context: ./task1-knowledge-brain
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - KB_API_KEY=${KB_API_KEY:-kb_secret_dev_key_2026}
+      - LLM_PROVIDER=${LLM_PROVIDER:-claude}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - PRIMARY_MODEL=claude-haiku-5-5
+    volumes:
+      - t1_data:/app/data
+
+  # Task 1: Knowledge Brain Streamlit UI
+  kb-ui:
+    build:
+      context: ./task1-knowledge-brain
+      dockerfile: Dockerfile
+    command: streamlit run ui/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - KB_BASE_URL=http://kb-api:8000/v1
+      - KB_API_KEY=${KB_API_KEY:-kb_secret_dev_key_2026}
+    depends_on:
+      - kb-api
+
+  # Task 2: Inbox Agent (Next.js)
+  inbox:
+    build:
+      context: ./task2-inbox-agent
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - KB_BASE_URL=http://kb-api:8000/v1
+      - KB_API_KEY=${KB_API_KEY:-kb_secret_dev_key_2026}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    depends_on:
+      - kb-api
+
+  # Task 3: Meeting -> Scope Streamlit UI
+  scope-ui:
+    build:
+      context: ./task3-meeting-to-scope
+      dockerfile: Dockerfile
+    command: streamlit run ui/streamlit_app.py --server.port 8502 --server.address 0.0.0.0
+    ports:
+      - "8502:8502"
+    environment:
+      - KB_BASE_URL=http://kb-api:8000/v1
+      - KB_API_KEY=${KB_API_KEY:-kb_secret_dev_key_2026}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    depends_on:
+      - kb-api
+
+volumes:
+  t1_data:

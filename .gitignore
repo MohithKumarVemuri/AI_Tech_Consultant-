@@ -1,0 +1,64 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+env/
+ENV/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Database & Vector Store data
+*.db
+*.sqlite
+*.sqlite3
+chroma_db/
+task1-knowledge-brain/chroma_db/
+task1-knowledge-brain/task1.db
+task2-inbox-agent/inbox.db
+task3-meeting-to-scope/scope.db
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/

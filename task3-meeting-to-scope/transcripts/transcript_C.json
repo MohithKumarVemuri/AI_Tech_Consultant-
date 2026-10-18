@@ -1,0 +1,44 @@
+{
+  "project_id": "PRJ-ALPHA",
+  "project_name": "Apex Medical Directory Follow-up Scope Review",
+  "meeting_date": "2026-10-16T11:00:00Z",
+  "client_name": "Dr. Brenda Vance (Apex Health)",
+  "consultant_name": "Sarah Jenkins (Senior AI Architect)",
+  "dialogue": [
+    {
+      "timestamp": "00:01:45",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Hi Sarah, thanks for meeting again. After reviewing the initial scope with our clinic board, we have a few critical scope adjustments."
+    },
+    {
+      "timestamp": "00:02:30",
+      "speaker": "Sarah Jenkins",
+      "text": "Sure Dr. Vance, let's walk through what changed."
+    },
+    {
+      "timestamp": "00:03:15",
+      "speaker": "Dr. Brenda Vance",
+      "text": "First, our board decided that nobody uses fax machines anymore. Please remove the legacy Fax Number directory filter entirely."
+    },
+    {
+      "timestamp": "00:04:10",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Instead, we desperately need Geolocation Radius Search powered by Google Maps so patients can find doctors within 15 miles of their home address."
+    },
+    {
+      "timestamp": "00:06:00",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Because of clinic budget approvals, we need to shift the target completion date from November 15th to December 1st, 2026."
+    },
+    {
+      "timestamp": "00:07:30",
+      "speaker": "Dr. Brenda Vance",
+      "text": "Oh, and one more thing: can your team also build native iOS and Android apps for the Apple App Store and Google Play within this same contract?"
+    },
+    {
+      "timestamp": "00:08:45",
+      "speaker": "Sarah Jenkins",
+      "text": "Native App Store builds represent an entirely separate multi-platform mobile development initiative. We will flag that as an Out-of-Scope item and provide an optional separate estimate."
+    }
+  ]
+}
